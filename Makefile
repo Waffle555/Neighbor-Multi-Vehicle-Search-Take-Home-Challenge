@@ -1,27 +1,25 @@
-.PHONY: setup run test format lint build run-prod
+.PHONY: setup run test format lint build run-prod venv
 
-setup:
-	pip install -r requirements.txt
+venv:
+	python3 -m venv .venv
+	. .venv/bin/activate && pip install --upgrade pip
 
-
-run: setup
-	uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
+setup: venv
+	. .venv/bin/activate && pip install -r requirements.txt
 
 build: 
 	docker build -t fastapi-app .
 
-run-prod: 
+run: 
 	docker run -p 8000:8000 fastapi-app
 
-
-test: setup
-	pytest -v
+test: 
+	. .venv/bin/activate && pytest -v
 
 format: setup
-	black .
-	ruff --fix .
+	. .venv/bin/activate && black .
+	. .venv/bin/activate && ruff --fix .
 
 lint: setup
-	ruff check .
-	black --check . 
+	. .venv/bin/activate && ruff check .
+	. .venv/bin/activate && black --check . 
